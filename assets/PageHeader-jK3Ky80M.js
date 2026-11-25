@@ -1,0 +1,1 @@
+import{G as e}from"./index-1vxBez6-.js";var t=e();function n({title:e,action:n}){return(0,t.jsxs)(`header`,{className:`page-header`,children:[(0,t.jsx)(`h2`,{className:`text-preset-1`,children:e}),n]})}export{n as t};

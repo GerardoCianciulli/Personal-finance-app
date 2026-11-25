@@ -1,1 +1,0 @@
-import{G as e,R as t,j as n}from"./index-BuRoSVpS.js";var r=e();function i({name:e,src:i,size:a=`md`}){let o=`avatar avatar--${a}`;return i?(0,r.jsx)(`img`,{className:o,src:n(i),alt:``,width:40,height:40,loading:`lazy`}):(0,r.jsx)(`span`,{className:`${o} avatar--initials`,"aria-hidden":`true`,children:t(e)})}export{i as t};
