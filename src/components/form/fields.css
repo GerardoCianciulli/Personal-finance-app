@@ -140,3 +140,94 @@
 .search-field svg path {
   fill: var(--color-grey-900);
 }
+
+/* Radio group (Deposit / Debit), styled like the input field states */
+.field--radio {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.field--radio .field__label {
+  margin-bottom: var(--space-50);
+  padding: 0;
+}
+
+.field--radio .field__message {
+  margin-top: var(--space-50);
+}
+
+.radio-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-200);
+}
+
+.radio-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-150);
+  padding: var(--space-150) var(--space-250);
+  background-color: var(--color-white);
+  border: 0.0625rem solid var(--color-beige-500);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-grey-900);
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+
+.radio-option:hover {
+  border-color: var(--color-grey-500);
+}
+
+.radio-option:has(.radio-option__input:checked),
+.radio-option:has(.radio-option__input:focus-visible) {
+  border-color: var(--color-grey-900);
+}
+
+.field--error .radio-option {
+  border-color: var(--color-red);
+}
+
+/* The native input stays in the page for keyboard and screen reader users */
+.radio-option__input {
+  position: absolute;
+  width: 0.0625rem;
+  height: 0.0625rem;
+  margin: 0;
+  opacity: 0;
+}
+
+.radio-option__control {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  border: 0.0625rem solid var(--color-beige-500);
+  border-radius: 50%;
+  transition: border-color var(--transition);
+}
+
+.radio-option__control::after {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--color-grey-900);
+  transform: scale(0);
+  transition: transform var(--transition);
+}
+
+.radio-option__input:checked + .radio-option__control {
+  border-color: var(--color-grey-900);
+}
+
+.radio-option__input:checked + .radio-option__control::after {
+  transform: scale(1);
+}

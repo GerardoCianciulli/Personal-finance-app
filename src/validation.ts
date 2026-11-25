@@ -67,5 +67,11 @@ export const transactionSchema = Yup.object({
   name: Yup.string().trim().required(REQUIRED).max(40, 'Use 40 characters or fewer'),
   category: Yup.string().required(REQUIRED).oneOf([...CATEGORIES], 'Choose a category'),
   date: Yup.string().required(REQUIRED),
-  amount: money().test('not-zero', 'Amount can’t be $0', (value) => value !== 0),
+  type: Yup.string().required(REQUIRED).oneOf(['deposit', 'debit'], 'Choose Deposit or Debit'),
+  // Deposits bring money in (above $0), debits take money out (below $0)
+  amount: money().when('type', ([type], schema) => {
+    if (type === 'deposit') return schema.moreThan(0, 'A deposit must be above $0')
+    if (type === 'debit') return schema.lessThan(0, 'A debit must be below $0, e.g. -25.50')
+    return schema.test('not-zero', 'Amount can’t be $0', (value) => value !== 0)
+  }),
 })

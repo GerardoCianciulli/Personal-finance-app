@@ -56,7 +56,9 @@ export default function Transactions() {
         title="Transactions"
         action={
           <button type="button" className="btn btn--primary" onClick={() => setAdding(true)}>
-            + Add New<span className="mobile-sr-only"> Transaction</span>
+            <span>
+              + Add New<span className="mobile-sr-only"> Transaction</span>
+            </span>
           </button>
         }
       />

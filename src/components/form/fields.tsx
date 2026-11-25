@@ -1,4 +1,4 @@
-import { useField } from 'formik'
+import { Field, useField } from 'formik'
 import { useId, useRef, useState, type InputHTMLAttributes, type ReactNode } from 'react'
 import { useDatePicker, usePasswordToggle } from '../../lib/interactions'
 import Dropdown, { type DropdownOption } from '../Dropdown'
@@ -189,5 +189,40 @@ export function DateField({ name, label }: DateFieldProps) {
         />
       </div>
     </FieldShell>
+  )
+}
+
+interface RadioFieldProps {
+  name: string
+  label: string
+  options: { value: string; label: string }[]
+}
+
+/** Group of radio buttons styled like the design system's input fields (e.g. Deposit / Debit) */
+export function RadioField({ name, label, options }: RadioFieldProps) {
+  const id = useId()
+  const error = useFieldError(name)
+
+  return (
+    <fieldset
+      className={`field field--radio${error ? ' field--error' : ''}`}
+      aria-describedby={error ? `${id}-message` : undefined}
+    >
+      <legend className="field__label">{label}</legend>
+      <div className="radio-group">
+        {options.map((option) => (
+          <label key={option.value} className="radio-option">
+            <Field type="radio" name={name} value={option.value} className="radio-option__input" />
+            <span className="radio-option__control" aria-hidden="true" />
+            <span>{option.label}</span>
+          </label>
+        ))}
+      </div>
+      {error && (
+        <p className="field__message field__message--error" id={`${id}-message`}>
+          {error}
+        </p>
+      )}
+    </fieldset>
   )
 }
