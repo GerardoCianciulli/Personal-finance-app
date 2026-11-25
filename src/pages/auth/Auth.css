@@ -1,0 +1,148 @@
+.auth {
+  display: flex;
+  min-height: 100vh;
+}
+
+.auth__topbar {
+  display: none;
+}
+
+.auth__aside {
+  flex-shrink: 0;
+  width: 37.5rem;
+  padding: var(--space-250);
+}
+
+.auth__illustration {
+  position: sticky;
+  top: var(--space-250);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 2.5rem);
+  min-height: 37.5rem;
+  max-height: 57.5rem;
+  padding: var(--space-500);
+  overflow: hidden;
+  background-color: var(--color-grey-900);
+  border-radius: var(--radius-md);
+  color: var(--color-white);
+}
+
+.auth__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.auth__logo,
+.auth__intro {
+  position: relative;
+}
+
+.auth__logo {
+  width: 7.625rem;
+  height: auto;
+}
+
+.auth__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-300);
+}
+
+.auth__tagline {
+  font-size: 2rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.auth__main {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--space-400) var(--space-500);
+}
+
+.auth-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-400);
+  width: 100%;
+  max-width: 35rem;
+  padding: var(--space-400);
+  background-color: var(--color-white);
+  border-radius: var(--radius-md);
+}
+
+.auth-card__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-200);
+}
+
+.auth-card__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-400);
+}
+
+.auth-card__switch {
+  text-align: center;
+  color: var(--color-grey-500);
+}
+
+.auth-card__switch a {
+  margin-left: var(--space-100);
+  font-weight: 700;
+  color: var(--color-grey-900);
+  text-decoration: underline;
+  text-underline-offset: 0.125rem;
+}
+
+.auth-card__switch a:hover,
+.auth-card__switch a:focus-visible {
+  color: var(--color-grey-500);
+  outline: none;
+}
+
+.auth-card__error {
+  color: var(--color-red);
+  text-align: center;
+}
+
+@media (max-width: 64rem) {
+  .auth {
+    flex-direction: column;
+  }
+
+  .auth__aside {
+    display: none;
+  }
+
+  .auth__topbar {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-300) var(--space-500);
+    background-color: var(--color-grey-900);
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  }
+
+  .auth__topbar svg {
+    width: 7.625rem;
+    height: auto;
+  }
+}
+
+@media (max-width: 40rem) {
+  .auth__main {
+    padding: var(--space-300) var(--space-200);
+  }
+
+  .auth-card {
+    padding: var(--space-300) var(--space-250);
+  }
+}

@@ -1,0 +1,189 @@
+/* Summary cards ------------------------------------------------------------ */
+.overview__summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-300);
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-150);
+  padding: var(--space-300);
+  background-color: var(--color-white);
+  border-radius: var(--radius-md);
+}
+
+.summary-card__label {
+  color: var(--color-grey-500);
+}
+
+.summary-card--dark {
+  background-color: var(--color-grey-900);
+  color: var(--color-white);
+}
+
+.summary-card--dark .summary-card__label {
+  color: var(--color-white);
+}
+
+/* Two column layout -------------------------------------------------------- */
+.overview__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 608fr) minmax(0, 428fr);
+  gap: var(--space-300);
+  align-items: start;
+}
+
+.overview__column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-300);
+}
+
+.section-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-250);
+}
+
+.overview-transactions {
+  gap: var(--space-400);
+}
+
+/* Legend: color tag + label + amount -------------------------------------- */
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-200);
+}
+
+/* Filled column by column, like the design (Savings, Concert Ticket | Gift, New Laptop) */
+.legend--grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, auto);
+  grid-auto-flow: column;
+}
+
+.legend__item {
+  display: flex;
+  gap: var(--space-200);
+  min-width: 0;
+}
+
+.legend__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-50);
+  min-width: 0;
+}
+
+.legend__text > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Pots card --------------------------------------------------------------- */
+.overview-pots__content {
+  display: grid;
+  grid-template-columns: minmax(0, 247fr) minmax(0, 277fr);
+  align-items: center;
+  gap: var(--space-250);
+}
+
+.overview-pots__total {
+  display: flex;
+  align-items: center;
+  gap: var(--space-200);
+  padding: var(--space-200);
+  min-height: 6.875rem;
+  background-color: var(--color-beige-100);
+  border-radius: var(--radius-md);
+}
+
+.overview-pots__icon {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.overview-pots__total .text-preset-4 {
+  margin-bottom: var(--space-150);
+}
+
+/* Budgets card ------------------------------------------------------------- */
+.overview-budgets__content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-200);
+  padding: var(--space-100) 0;
+}
+
+.overview-budgets__content .donut {
+  flex: 1 1 auto;
+}
+
+.overview-budgets__legend {
+  flex: 0 0 auto;
+}
+
+/* Recurring bills card ----------------------------------------------------- */
+.overview-bills {
+  gap: var(--space-400);
+}
+
+.overview-bills__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-150);
+}
+
+.overview-bills__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-200);
+  padding: var(--space-250) var(--space-200);
+  background-color: var(--color-beige-100);
+  border-left: 0.25rem solid;
+  border-radius: var(--radius-sm);
+}
+
+/* Responsive --------------------------------------------------------------- */
+@media (max-width: 80rem) {
+  .overview__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 40rem) {
+  .overview__summary {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-150);
+  }
+
+  .summary-card {
+    padding: var(--space-250);
+  }
+
+  .overview__grid,
+  .overview__column {
+    gap: var(--space-200);
+  }
+
+  .overview-pots__content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .overview-budgets__content {
+    flex-direction: column;
+  }
+
+  .overview-budgets__legend {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-self: stretch;
+  }
+}

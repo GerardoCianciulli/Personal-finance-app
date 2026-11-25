@@ -1,0 +1,142 @@
+/* ==========================================================================
+   Form fields (Input Field component in the design system)
+   ========================================================================== */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-50);
+}
+
+.field__label {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--color-grey-500);
+}
+
+.field__control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-150);
+  padding: var(--space-150) var(--space-250);
+  background-color: var(--color-white);
+  border: 0.0625rem solid var(--color-beige-500);
+  border-radius: var(--radius-sm);
+  cursor: text;
+  transition: border-color var(--transition);
+}
+
+.field__control:hover {
+  border-color: var(--color-grey-500);
+}
+
+.field__control:focus-within {
+  border-color: var(--color-grey-900);
+}
+
+.field--error .field__control,
+.field--error .field__control:hover,
+.field--error .field__control:focus-within {
+  border-color: var(--color-red);
+}
+
+.field__input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-grey-900);
+}
+
+.field__input::placeholder {
+  color: var(--color-beige-500);
+  opacity: 1;
+}
+
+.field__prefix {
+  color: var(--color-beige-500);
+}
+
+.field__message {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-grey-500);
+  text-align: right;
+}
+
+.field__message--error {
+  color: var(--color-red);
+}
+
+/* Password visibility toggle (jQuery toggles .is-visible) */
+.field__toggle {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+}
+
+.field__toggle path {
+  fill: var(--color-grey-900);
+}
+
+.field__toggle:focus-visible {
+  outline: 0.0625rem solid var(--color-grey-900);
+  outline-offset: 0.125rem;
+  border-radius: 0.125rem;
+}
+
+.field__toggle-hide,
+.field__toggle.is-visible .field__toggle-show {
+  display: none;
+}
+
+.field__toggle.is-visible .field__toggle-hide {
+  display: block;
+}
+
+/* Date field */
+.field__control--date {
+  cursor: pointer;
+}
+
+.field__control--date .field__input {
+  cursor: pointer;
+  min-height: 1.3125rem;
+}
+
+.field__control--date .field__input.is-empty {
+  color: var(--color-beige-500);
+}
+
+.field__control--date .field__input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+/* Search field in page toolbars */
+.search-field {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 20rem;
+}
+
+.search-field .field__control {
+  padding-right: var(--space-250);
+}
+
+.search-field svg {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+}
+
+.search-field svg path {
+  fill: var(--color-grey-900);
+}

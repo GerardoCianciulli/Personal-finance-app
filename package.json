@@ -1,0 +1,38 @@
+{
+  "name": "personal-finance-app",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "homepage": "https://GerardoCianciulli.github.io/Personal-finance-app/",
+  "scripts": {
+    "seed": "node scripts/build-db.mjs",
+    "server": "node scripts/build-db.mjs --if-missing && json-server --watch db.json --port 3001",
+    "client": "vite",
+    "dev": "concurrently -k -n api,web -c cyan,magenta \"npm:server\" \"npm:client\"",
+    "build": "tsc -b && vite build && node scripts/spa-fallback.mjs",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "formik": "^2.4.9",
+    "gh-pages": "^6.3.0",
+    "jquery": "^4.1.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.7",
+    "yup": "^1.7.1"
+  },
+  "devDependencies": {
+    "@types/jquery": "^4.0.1",
+    "@types/node": "^26.6.10",
+    "@types/react": "^19.3.3",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "concurrently": "^10.0.7",
+    "json-server": "^0.17.4",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vite-plugin-svgr": "^5.2.0"
+  }
+}

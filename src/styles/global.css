@@ -1,0 +1,379 @@
+/* ==========================================================================
+   Fonts
+   ========================================================================== */
+@font-face {
+  font-family: 'Public Sans';
+  src: url('../assets/fonts/PublicSans-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ==========================================================================
+   Design tokens (from the Figma design system)
+   ========================================================================== */
+:root {
+  /* Colors */
+  --color-beige-100: #f8f4f0;
+  --color-beige-500: #98908b;
+  --color-grey-900: #201f24;
+  --color-grey-500: #696868;
+  --color-grey-300: #b3b3b3;
+  --color-grey-100: #f2f2f2;
+  --color-white: #ffffff;
+
+  --color-green: #277c78;
+  --color-yellow: #f2cdac;
+  --color-cyan: #82c9d7;
+  --color-navy: #626070;
+  --color-red: #c94736;
+  --color-purple: #826cb0;
+  --color-turquoise: #597c7c;
+  --color-brown: #93674f;
+  --color-magenta: #934f6f;
+  --color-blue: #3f82b2;
+  --color-navy-grey: #97a0ac;
+  --color-army-green: #7f9161;
+  --color-gold: #cab361;
+  --color-orange: #be6c49;
+  --color-pink: #af81ba;
+
+  /* Spacing */
+  --space-50: 0.25rem;
+  --space-100: 0.5rem;
+  --space-150: 0.75rem;
+  --space-200: 1rem;
+  --space-250: 1.25rem;
+  --space-300: 1.5rem;
+  --space-400: 2rem;
+  --space-500: 2.5rem;
+
+  /* Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+
+  /* Shadows */
+  --shadow-dropdown: 0 0.25rem 1.5rem rgba(0, 0, 0, 0.25);
+
+  /* Layout */
+  --sidebar-width: 18.75rem;
+  --sidebar-width-minimized: 5.5rem;
+  --bottom-nav-height: 4.625rem;
+
+  --transition: 150ms ease;
+}
+
+/* ==========================================================================
+   Reset
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  font-family: 'Public Sans', system-ui, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-grey-900);
+  background-color: var(--color-beige-100);
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+body.is-modal-open {
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Typography presets
+   ========================================================================== */
+.text-preset-1 {
+  font-size: 2rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.text-preset-2 {
+  font-size: 1.25rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.text-preset-3 {
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.text-preset-4 {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.text-preset-4-bold {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.text-preset-5 {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.text-preset-5-bold {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.text-muted {
+  color: var(--color-grey-500);
+}
+
+.text-positive {
+  color: var(--color-green);
+}
+
+.text-danger {
+  color: var(--color-red);
+}
+
+.sr-only {
+  position: absolute;
+  width: 0.0625rem;
+  height: 0.0625rem;
+  padding: 0;
+  margin: -0.0625rem;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-200);
+  padding: var(--space-200);
+  border: 0.0625rem solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 700;
+  white-space: nowrap;
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.btn:focus-visible {
+  outline: none;
+}
+
+.btn--primary {
+  background-color: var(--color-grey-900);
+  color: var(--color-white);
+}
+
+.btn--primary:hover,
+.btn--primary:focus-visible {
+  background-color: var(--color-grey-500);
+}
+
+.btn--secondary {
+  background-color: var(--color-beige-100);
+  color: var(--color-grey-900);
+}
+
+.btn--secondary:hover,
+.btn--secondary:focus-visible {
+  background-color: var(--color-white);
+  border-color: var(--color-beige-500);
+}
+
+.btn--destroy {
+  background-color: var(--color-red);
+  color: var(--color-white);
+}
+
+.btn--destroy:hover,
+.btn--destroy:focus-visible {
+  background-color: color-mix(in srgb, var(--color-red) 80%, var(--color-white));
+}
+
+.btn--tertiary {
+  gap: var(--space-150);
+  padding: 0;
+  border: 0;
+  font-weight: 400;
+  color: var(--color-grey-500);
+}
+
+.btn--tertiary svg path {
+  fill: currentColor;
+}
+
+.btn--tertiary:hover,
+.btn--tertiary:focus-visible {
+  color: var(--color-grey-900);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* "No, Go Back" style text button inside delete modal */
+.btn--plain {
+  padding: 0;
+  border: 0;
+  font-weight: 400;
+  color: var(--color-grey-500);
+}
+
+.btn--plain:hover,
+.btn--plain:focus-visible {
+  color: var(--color-grey-900);
+}
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+.card {
+  background-color: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-400);
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-300);
+}
+
+@media (max-width: 40rem) {
+  .card {
+    padding: var(--space-300) var(--space-250);
+  }
+}
+
+/* ==========================================================================
+   Page header
+   ========================================================================== */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-400);
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-300);
+  min-height: 3.5rem;
+}
+
+@media (max-width: 40rem) {
+  .page-header {
+    flex-wrap: wrap;
+    row-gap: var(--space-200);
+    min-height: auto;
+  }
+
+  /* Text kept for screen readers but hidden on small screens, e.g. "+ Add New Transaction" */
+  .mobile-sr-only {
+    position: absolute;
+    width: 0.0625rem;
+    height: 0.0625rem;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .page-header .btn {
+    padding: var(--space-200);
+  }
+}
+
+/* ==========================================================================
+   Color tag (thin vertical bar used in legends and summaries)
+   ========================================================================== */
+.color-tag {
+  flex-shrink: 0;
+  width: 0.25rem;
+  align-self: stretch;
+  border-radius: var(--radius-sm);
+}
+
+.color-dot {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+}
+
+/* ==========================================================================
+   Divider
+   ========================================================================== */
+.divider {
+  border: 0;
+  border-top: 0.0625rem solid var(--color-grey-100);
+}
+
+/* Loading / empty states */
+.empty-state {
+  padding: var(--space-300) 0;
+  text-align: center;
+  color: var(--color-grey-500);
+}

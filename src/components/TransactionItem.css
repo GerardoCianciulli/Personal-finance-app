@@ -1,0 +1,80 @@
+.tx-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.tx-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-200);
+  padding: var(--space-250) 0;
+}
+
+.tx-item:first-child {
+  padding-top: 0;
+}
+
+.tx-item:last-child {
+  padding-bottom: 0;
+}
+
+.tx-item + .tx-item {
+  border-top: 0.0625rem solid var(--color-grey-100);
+}
+
+.tx-item__who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-200);
+  min-width: 0;
+}
+
+.tx-item__name {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tx-item__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-50);
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.tx-item__amount {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.tx-item__date {
+  color: var(--color-grey-500);
+}
+
+/* Compact rows (budget latest spending) */
+.tx-item--compact {
+  padding: var(--space-150) 0;
+}
+
+.tx-item--compact .tx-item__name,
+.tx-item--compact .tx-item__amount {
+  font-size: 0.75rem;
+}
+
+.tx-item--compact .avatar {
+  width: 2rem;
+  height: 2rem;
+}
+
+@media (max-width: 40rem) {
+  .tx-item--compact .avatar {
+    display: none;
+  }
+}

@@ -1,0 +1,199 @@
+/* Toolbar: search + sort + filter (shared with Recurring Bills) ------------- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-300);
+}
+
+.toolbar .search-field {
+  flex: 0 1 20rem;
+}
+
+.toolbar__filters {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-300);
+}
+
+.transactions__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-300);
+}
+
+/* Table -------------------------------------------------------------------- */
+.tx-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.tx-table th {
+  padding: var(--space-150) var(--space-200);
+  border-bottom: 0.0625rem solid var(--color-grey-100);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  font-weight: 400;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--color-grey-500);
+}
+
+.tx-table th:nth-child(2),
+.tx-table th:nth-child(3) {
+  width: 9.5rem;
+}
+
+.tx-table th:last-child {
+  width: 12.5rem;
+  text-align: right;
+}
+
+.tx-table td {
+  padding: var(--space-200);
+  vertical-align: middle;
+  border-bottom: 0.0625rem solid var(--color-grey-100);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-grey-500);
+}
+
+.tx-table tbody tr:first-child td {
+  padding-top: var(--space-300);
+}
+
+.tx-table tbody tr:last-child td {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.tx-table__who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-200);
+}
+
+.tx-table__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-grey-900);
+}
+
+td.tx-table__amount {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-align: right;
+  color: var(--color-grey-900);
+}
+
+td.tx-table__amount.text-positive {
+  color: var(--color-green);
+}
+
+/* Tablet ------------------------------------------------------------------- */
+@media (max-width: 64rem) {
+  .toolbar {
+    gap: var(--space-300);
+  }
+
+  .toolbar .search-field {
+    flex: 1 1 10rem;
+  }
+
+  .tx-table th:nth-child(2) {
+    width: 7.5rem;
+  }
+
+  .tx-table th:nth-child(3) {
+    width: 8.5rem;
+  }
+
+  .tx-table th:last-child {
+    width: 7.5rem;
+  }
+}
+
+/* Mobile: stacked rows ----------------------------------------------------- */
+@media (max-width: 40rem) {
+  .toolbar {
+    gap: var(--space-300);
+  }
+
+  .toolbar .search-field {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+
+  .tx-table,
+  .tx-table tbody,
+  .tx-table tr,
+  .tx-table td {
+    display: block;
+  }
+
+  .tx-table thead {
+    display: none;
+  }
+
+  .tx-table tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'avatar name amount'
+      'avatar category date';
+    align-items: center;
+    column-gap: var(--space-150);
+    row-gap: var(--space-50);
+    padding: var(--space-200) 0;
+    border-bottom: 0.0625rem solid var(--color-grey-100);
+  }
+
+  .tx-table tbody tr:first-child {
+    padding-top: 0;
+  }
+
+  .tx-table tbody tr:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .tx-table td,
+  .tx-table tbody tr:first-child td {
+    padding: 0;
+    border: 0;
+  }
+
+  .tx-table td.tx-table__who-cell,
+  .tx-table__who {
+    display: contents;
+  }
+
+  .tx-table__who .avatar {
+    grid-area: avatar;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .tx-table__name {
+    grid-area: name;
+  }
+
+  .tx-table__category {
+    grid-area: category;
+  }
+
+  .tx-table__date {
+    grid-area: date;
+    text-align: right;
+  }
+
+  td.tx-table__amount {
+    grid-area: amount;
+  }
+}

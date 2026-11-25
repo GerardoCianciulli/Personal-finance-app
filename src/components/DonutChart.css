@@ -1,0 +1,45 @@
+/* 15rem chart with an 11.72rem translucent ring and a 10.125rem white center (from the design) */
+.donut {
+  position: relative;
+  flex-shrink: 0;
+  width: 15rem;
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.donut__ring,
+.donut__inner-ring,
+.donut__center {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.donut__ring {
+  inset: 0;
+}
+
+.donut__inner-ring {
+  inset: 10.9%;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.donut__center {
+  inset: 16.25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-100);
+  background-color: var(--color-white);
+  text-align: center;
+}
+
+.donut__spent {
+  font-size: 2rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.donut__limit {
+  color: var(--color-grey-500);
+}

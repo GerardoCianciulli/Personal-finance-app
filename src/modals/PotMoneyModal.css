@@ -1,0 +1,51 @@
+.pot-change {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-200);
+  padding: var(--space-150) 0;
+}
+
+.pot-change__amount {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-200);
+}
+
+.pot-change__bar {
+  display: flex;
+  gap: 0.125rem;
+  height: 0.5rem;
+  overflow: hidden;
+  background-color: var(--color-beige-100);
+  border-radius: 0.25rem;
+}
+
+.pot-change__base,
+.pot-change__delta {
+  height: 100%;
+  transition: width 200ms ease;
+}
+
+.pot-change__base {
+  background-color: var(--color-grey-900);
+  border-radius: 0.25rem 0 0 0.25rem;
+}
+
+.pot-change__delta {
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.pot-change__delta--add {
+  background-color: var(--color-green);
+}
+
+.pot-change__delta--withdraw {
+  background-color: var(--color-red);
+}
+
+.pot-change__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-100);
+}

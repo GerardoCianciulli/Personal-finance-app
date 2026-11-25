@@ -68,7 +68,7 @@ Your users should be able to:
 
 ### Links
 
-- Live Site URL: [github pages](https://gerardocianciulli.github.io/personal-finance-app/)
+- Live Site URL: [github pages](https://gerardocianciulli.github.io/Personal-finance-app/)
 
 ## My process
 
@@ -158,7 +158,7 @@ The data is read and written with Fetch through json-server during development. 
 
 ```bash
 npm install
-npm run dev      # json-server on http://localhost:3001 + Vite on http://localhost:5173/personal-finance-app/
+npm run dev      # json-server on http://localhost:3001 + Vite on http://localhost:5173/Personal-finance-app/
 npm run seed     # reset db.json to the sample data
 npm run deploy   # build and publish the dist folder to GitHub Pages
 ```

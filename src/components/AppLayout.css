@@ -1,0 +1,26 @@
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app__main {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-400) var(--space-500);
+}
+
+@media (max-width: 64rem) {
+  .app {
+    display: block;
+  }
+
+  .app__main {
+    padding: var(--space-400) var(--space-500) calc(var(--bottom-nav-height) + var(--space-400));
+  }
+}
+
+@media (max-width: 40rem) {
+  .app__main {
+    padding: var(--space-300) var(--space-200) calc(3.25rem + var(--space-300));
+  }
+}
