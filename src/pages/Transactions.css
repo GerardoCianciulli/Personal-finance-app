@@ -69,20 +69,26 @@
   padding-bottom: 0;
 }
 
-.tx-table__who {
-  display: flex;
-  align-items: center;
-  gap: var(--space-200);
-}
-
-.tx-table__name {
-  min-width: 0;
+.tx-table td.tx-table__name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.875rem;
   font-weight: 700;
   color: var(--color-grey-900);
+}
+
+/* Rows keep the design's 2.5rem content height now that there is no avatar */
+.tx-table tbody td {
+  height: 4.5rem;
+}
+
+.tx-table tbody tr:first-child td {
+  height: 5rem;
+}
+
+.tx-table tbody tr:last-child td {
+  height: 3.5rem;
 }
 
 td.tx-table__amount {
@@ -143,10 +149,10 @@ td.tx-table__amount.text-positive {
 
   .tx-table tr {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-      'avatar name amount'
-      'avatar category date';
+      'name amount'
+      'category date';
     align-items: center;
     column-gap: var(--space-150);
     row-gap: var(--space-50);
@@ -164,23 +170,15 @@ td.tx-table__amount.text-positive {
   }
 
   .tx-table td,
-  .tx-table tbody tr:first-child td {
+  .tx-table tbody td,
+  .tx-table tbody tr:first-child td,
+  .tx-table tbody tr:last-child td {
+    height: auto;
     padding: 0;
     border: 0;
   }
 
-  .tx-table td.tx-table__who-cell,
-  .tx-table__who {
-    display: contents;
-  }
-
-  .tx-table__who .avatar {
-    grid-area: avatar;
-    width: 2rem;
-    height: 2rem;
-  }
-
-  .tx-table__name {
+  .tx-table td.tx-table__name {
     grid-area: name;
   }
 

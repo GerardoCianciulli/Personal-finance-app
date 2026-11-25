@@ -123,20 +123,26 @@
   padding-bottom: 0;
 }
 
-.bills-table__who {
-  display: flex;
-  align-items: center;
-  gap: var(--space-200);
-}
-
-.bills-table__name {
-  min-width: 0;
+.bills-table td.bills-table__name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.875rem;
   font-weight: 700;
   color: var(--color-grey-900);
+}
+
+/* Rows keep the design's 2rem content height now that there is no avatar */
+.bills-table tbody td {
+  height: 4.5rem;
+}
+
+.bills-table tbody tr:first-child td {
+  height: 4.75rem;
+}
+
+.bills-table tbody tr:last-child td {
+  height: 3.25rem;
 }
 
 .bills-table__due-inner {
@@ -220,7 +226,7 @@ td.bills-table__menu .ellipsis-menu {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     grid-template-areas:
-      'who who menu'
+      'name name menu'
       'due amount menu';
     align-items: center;
     column-gap: var(--space-150);
@@ -239,13 +245,16 @@ td.bills-table__menu .ellipsis-menu {
   }
 
   .bills-table td,
-  .bills-table tbody tr:first-child td {
+  .bills-table tbody td,
+  .bills-table tbody tr:first-child td,
+  .bills-table tbody tr:last-child td {
+    height: auto;
     padding: 0;
     border: 0;
   }
 
-  .bills-table__who-cell {
-    grid-area: who;
+  .bills-table td.bills-table__name {
+    grid-area: name;
   }
 
   .bills-table__due {

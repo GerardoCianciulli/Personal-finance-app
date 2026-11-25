@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import Avatar from '../components/Avatar'
 import Dropdown from '../components/Dropdown'
 import EllipsisMenu from '../components/EllipsisMenu'
 import { IconBillDue, IconBillPaid, IconRecurringBills, IconSortMobile } from '../components/icons'
@@ -112,12 +111,7 @@ export default function RecurringBills() {
                   const status = getBillStatus(bill, transactions, referenceDate)
                   return (
                     <tr key={bill.id} className={`is-${status}`}>
-                      <td className="bills-table__who-cell">
-                        <div className="bills-table__who">
-                          <Avatar name={bill.name} src={bill.avatar} size="sm" />
-                          <span className="bills-table__name">{bill.name}</span>
-                        </div>
-                      </td>
+                      <td className="bills-table__name">{bill.name}</td>
                       <td className="bills-table__due">
                         <span className="bills-table__due-inner">
                           {formatDueDay(bill.dueDate)}

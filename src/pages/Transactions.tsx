@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import Avatar from '../components/Avatar'
 import Dropdown from '../components/Dropdown'
 import { IconFilterMobile, IconSortMobile } from '../components/icons'
 import PageHeader from '../components/PageHeader'
@@ -110,12 +109,7 @@ export default function Transactions() {
             <tbody>
               {visible.map((t) => (
                 <tr key={t.id}>
-                  <td className="tx-table__who-cell">
-                    <div className="tx-table__who">
-                      <Avatar name={t.name} src={t.avatar} />
-                      <span className="tx-table__name">{t.name}</span>
-                    </div>
-                  </td>
+                  <td className="tx-table__name">{t.name}</td>
                   <td className="tx-table__category">{t.category}</td>
                   <td className="tx-table__date">
                     <time dateTime={t.date}>{formatDate(t.date)}</time>
