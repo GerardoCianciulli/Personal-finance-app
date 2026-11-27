@@ -12,6 +12,11 @@ export function getReferenceDate(transactions: Transaction[]): Date {
   return new Date(`${referenceIsoDate(transactions)}T00:00:00Z`)
 }
 
+/** Current balance: every transaction added together (deposits minus spending), rounded to cents */
+export function getCurrentBalance(transactions: Pick<Transaction, 'amount'>[]): number {
+  return Math.round(transactions.reduce((sum, t) => sum + t.amount, 0) * 100) / 100
+}
+
 const isSameMonth = (a: Date, b: Date) =>
   a.getUTCFullYear() === b.getUTCFullYear() && a.getUTCMonth() === b.getUTCMonth()
 

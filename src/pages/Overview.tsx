@@ -7,12 +7,12 @@ import SectionCard from '../components/SectionCard'
 import TransactionItem from '../components/TransactionItem'
 import { useData } from '../context/DataContext'
 import IncomeModal from '../modals/IncomeModal'
-import { getBillSummary, getBudgetSpent, getMonthlyIncome, sortTransactions } from '../utils/finance'
+import { getBillSummary, getBudgetSpent, getCurrentBalance, getMonthlyIncome, sortTransactions } from '../utils/finance'
 import { formatMoney, formatMoneyShort } from '../utils/format'
 import './Overview.css'
 
 export default function Overview() {
-  const { balance, pots, budgets, transactions, recurringBills, incomes, referenceDate } = useData()
+  const { pots, budgets, transactions, recurringBills, incomes, referenceDate } = useData()
   const [editingIncome, setEditingIncome] = useState(false)
 
   const totalSaved = pots.reduce((sum, pot) => sum + pot.total, 0)
@@ -22,7 +22,8 @@ export default function Overview() {
   const bills = getBillSummary(recurringBills, transactions, referenceDate)
 
   const summary = [
-    { label: 'Current Balance', value: balance.current, dark: true, editable: false },
+    // Current Balance: all transactions added together (deposits minus spending)
+    { label: 'Current Balance', value: getCurrentBalance(transactions), dark: true, editable: false },
     // Income: payments of the incomes listed in Edit Income received this month
     { label: 'Income', value: getMonthlyIncome(incomes, referenceDate), dark: false, editable: true },
     // Expenses: all recurring bills added together (the Recurring Bills page's "Total Bills")

@@ -4,6 +4,7 @@ import { TextField } from '../components/form/fields'
 import Modal from '../components/Modal'
 import { useData } from '../context/DataContext'
 import type { Pot } from '../types'
+import { getCurrentBalance } from '../utils/finance'
 import { formatMoney, formatMoneyShort, formatPercent } from '../utils/format'
 import { potMoneySchema } from '../validation'
 import './PotMoneyModal.css'
@@ -34,10 +35,11 @@ const COPY = {
 const pct = (value: number, target: number) => (target > 0 ? Math.min(Math.max(value / target, 0), 1) * 100 : 0)
 
 export default function PotMoneyModal({ pot, mode, onClose }: PotMoneyModalProps) {
-  const { balance, movePotMoney } = useData()
+  const { transactions, movePotMoney } = useData()
   const [formError, setFormError] = useState('')
   const copy = COPY[mode]
-  const max = mode === 'add' ? Math.max(balance.current, 0) : pot.total
+  // Adding is limited to the Current Balance shown on Overview (the sum of all transactions)
+  const max = mode === 'add' ? Math.max(getCurrentBalance(transactions), 0) : pot.total
   const overMessage =
     mode === 'add'
       ? `You only have ${formatMoney(max)} in your current balance`
