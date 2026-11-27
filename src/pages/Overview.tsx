@@ -25,7 +25,8 @@ export default function Overview() {
     { label: 'Current Balance', value: balance.current, dark: true, editable: false },
     // Income: payments of the incomes listed in Edit Income received this month
     { label: 'Income', value: getMonthlyIncome(incomes, referenceDate), dark: false, editable: true },
-    { label: 'Expenses', value: balance.expenses, dark: false, editable: false },
+    // Expenses: all recurring bills added together (the Recurring Bills page's "Total Bills")
+    { label: 'Expenses', value: bills.total, dark: false, editable: false },
   ]
 
   return (
