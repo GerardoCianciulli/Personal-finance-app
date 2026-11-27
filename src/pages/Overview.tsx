@@ -1,16 +1,19 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import DonutChart from '../components/DonutChart'
+import EllipsisMenu from '../components/EllipsisMenu'
 import { IconPot } from '../components/icons'
 import PageHeader from '../components/PageHeader'
 import SectionCard from '../components/SectionCard'
 import TransactionItem from '../components/TransactionItem'
 import { useData } from '../context/DataContext'
-import { getBillSummary, getBudgetSpent, sortTransactions } from '../utils/finance'
+import IncomeModal from '../modals/IncomeModal'
+import { getBillSummary, getBudgetSpent, getMonthlyIncome, sortTransactions } from '../utils/finance'
 import { formatMoney, formatMoneyShort } from '../utils/format'
 import './Overview.css'
 
 export default function Overview() {
-  const { balance, pots, budgets, transactions, recurringBills, referenceDate } = useData()
+  const { balance, pots, budgets, transactions, recurringBills, incomes, referenceDate } = useData()
+  const [editingIncome, setEditingIncome] = useState(false)
 
   const totalSaved = pots.reduce((sum, pot) => sum + pot.total, 0)
   const latestTransactions = useMemo(() => sortTransactions(transactions, 'Latest').slice(0, 5), [transactions])
@@ -19,9 +22,10 @@ export default function Overview() {
   const bills = getBillSummary(recurringBills, transactions, referenceDate)
 
   const summary = [
-    { label: 'Current Balance', value: balance.current, dark: true },
-    { label: 'Income', value: balance.income, dark: false },
-    { label: 'Expenses', value: balance.expenses, dark: false },
+    { label: 'Current Balance', value: balance.current, dark: true, editable: false },
+    // Income: payments of the incomes listed in Edit Income received this month
+    { label: 'Income', value: getMonthlyIncome(incomes, referenceDate), dark: false, editable: true },
+    { label: 'Expenses', value: balance.expenses, dark: false, editable: false },
   ]
 
   return (
@@ -29,9 +33,14 @@ export default function Overview() {
       <PageHeader title="Overview" />
 
       <section className="overview__summary" aria-label="Balance summary">
-        {summary.map(({ label, value, dark }) => (
+        {summary.map(({ label, value, dark, editable }) => (
           <article key={label} className={`summary-card${dark ? ' summary-card--dark' : ''}`}>
-            <h2 className="summary-card__label text-preset-4">{label}</h2>
+            <div className="summary-card__header">
+              <h2 className="summary-card__label text-preset-4">{label}</h2>
+              {editable && (
+                <EllipsisMenu label={label} items={[{ label: 'Edit Income', onSelect: () => setEditingIncome(true) }]} />
+              )}
+            </div>
             <p className="text-preset-1">
               {value < 0 ? '-' : ''}
               {formatMoney(value)}
@@ -122,6 +131,8 @@ export default function Overview() {
           </SectionCard>
         </div>
       </div>
+
+      {editingIncome && <IncomeModal onClose={() => setEditingIncome(false)} />}
     </div>
   )
 }

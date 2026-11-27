@@ -310,3 +310,8 @@ export function scrollIntoViewIfNeeded(element: HTMLElement | null) {
   const current = $(window).scrollTop() ?? 0
   if (top < current) $('html, body').stop(true).animate({ scrollTop: top }, 250)
 }
+
+/** Moves keyboard focus to the first input inside an element, e.g. a newly added form row */
+export function focusFirstInput(element: Element | null | undefined) {
+  if (element) $(element).find('input').first().trigger('focus')
+}

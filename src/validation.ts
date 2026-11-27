@@ -1,5 +1,5 @@
 import * as Yup from 'yup'
-import { CATEGORIES, POT_NAME_MAX_LENGTH, THEMES } from './constants'
+import { CATEGORIES, INCOME_FREQUENCIES, POT_NAME_MAX_LENGTH, THEMES } from './constants'
 
 export const REQUIRED = "Can't be empty"
 
@@ -74,4 +74,21 @@ export const transactionSchema = Yup.object({
     if (type === 'debit') return schema.lessThan(0, 'A debit must be below $0, e.g. -25.50')
     return schema.test('not-zero', 'Amount can’t be $0', (value) => value !== 0)
   }),
+})
+
+export const incomesSchema = Yup.object({
+  incomes: Yup.array().of(
+    Yup.object({
+      amount: positiveMoney(),
+      frequency: Yup.string()
+        .required(REQUIRED)
+        .oneOf(
+          INCOME_FREQUENCIES.map((f) => f.value),
+          'Choose a frequency',
+        ),
+      firstPaymentDate: Yup.string()
+        .required(REQUIRED)
+        .matches(/^\d{4}-\d{2}-\d{2}$/, 'Choose a date'),
+    }),
+  ),
 })

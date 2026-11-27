@@ -1,18 +1,28 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { getStore, type Store } from '../api/client'
-import type { Balance, Budget, Pot, RecurringBill, Transaction } from '../types'
+import { incomeTransactions, referenceIsoDate } from '../../scripts/db-seed.mjs'
+import { getStore, type UserStore } from '../api/client'
+import type { Balance, Budget, Income, Pot, RecurringBill, Transaction, UserData } from '../types'
 import { findAvatar, getReferenceDate } from '../utils/finance'
+import { useAuth } from './AuthContext'
 
 interface FinanceData {
   balance: Balance
+  /** Id of the signed-in user's balance record */
+  balanceId: number
   transactions: Transaction[]
   budgets: Budget[]
   pots: Pot[]
   recurringBills: RecurringBill[]
+  incomes: Income[]
 }
 
-type NewTransaction = Omit<Transaction, 'id' | 'avatar' | 'recurring'>
-type NewBill = Omit<RecurringBill, 'id' | 'avatar' | 'category'>
+// Pages pass the fields they edit; the provider adds the signed-in user's id
+type NewTransaction = Omit<Transaction, 'id' | 'userId' | 'avatar' | 'recurring'>
+type NewBill = Omit<RecurringBill, 'id' | 'userId' | 'avatar' | 'category'>
+type NewBudget = Omit<Budget, 'id' | 'userId'>
+type NewPot = Omit<Pot, 'id' | 'userId' | 'total'>
+/** An income row from the Edit Income form: existing rows keep their id */
+type IncomeInput = Omit<Income, 'id' | 'userId'> & { id?: number }
 
 interface DataContextValue extends FinanceData {
   status: 'loading' | 'ready' | 'error'
@@ -21,30 +31,78 @@ interface DataContextValue extends FinanceData {
   addTransaction(input: NewTransaction): Promise<void>
   updateTransaction(id: number, input: NewTransaction): Promise<void>
   deleteTransaction(id: number): Promise<void>
-  addBudget(input: Omit<Budget, 'id'>): Promise<void>
-  updateBudget(id: number, input: Omit<Budget, 'id'>): Promise<void>
+  addBudget(input: NewBudget): Promise<void>
+  updateBudget(id: number, input: NewBudget): Promise<void>
   deleteBudget(id: number): Promise<void>
-  addPot(input: Omit<Pot, 'id' | 'total'>): Promise<void>
-  updatePot(id: number, input: Omit<Pot, 'id' | 'total'>): Promise<void>
+  addPot(input: NewPot): Promise<void>
+  updatePot(id: number, input: NewPot): Promise<void>
   deletePot(id: number): Promise<void>
   /** Positive amount adds money to the pot, negative withdraws it */
   movePotMoney(id: number, amount: number): Promise<void>
   addBill(input: NewBill): Promise<void>
   updateBill(id: number, input: NewBill): Promise<void>
   deleteBill(id: number): Promise<void>
+  /** Replaces the list of incomes: creates new rows, updates changed ones, deletes removed ones */
+  saveIncomes(list: IncomeInput[]): Promise<void>
 }
 
 const DataContext = createContext<DataContextValue | null>(null)
 
 const EMPTY: FinanceData = {
   balance: { current: 0, income: 0, expenses: 0 },
+  balanceId: 0,
   transactions: [],
   budgets: [],
   pots: [],
   recurringBills: [],
+  incomes: [],
 }
 
 const round = (value: number) => Math.round(value * 100) / 100
+
+/**
+ * Replaces the scheduled income payments (transactions marked `fromIncome`) with the ones the
+ * given incomes produce, post-dated up to the end of the month. Returns the full transaction list.
+ */
+async function rebuildIncomeTransactions(store: UserStore, transactions: Transaction[], incomes: Income[]) {
+  const reference = referenceIsoDate(transactions)
+  for (const t of transactions) if (t.fromIncome) await store.remove('transactions', t.id)
+  const created: Transaction[] = []
+  for (const income of incomes) {
+    for (const payment of incomeTransactions(income, reference)) created.push(await store.create('transactions', payment))
+  }
+  return [...transactions.filter((t) => !t.fromIncome), ...created]
+}
+
+/**
+ * Opens the account's store and loads its data, upgrading old incomes on the way. Shared while
+ * in flight, so two simultaneous loads (e.g. React's development double-run) do the work once.
+ */
+const pendingAccountLoads = new Map<number, Promise<{ store: UserStore; data: UserData }>>()
+function loadAccount(userId: number) {
+  let promise = pendingAccountLoads.get(userId)
+  if (!promise) {
+    promise = (async () => {
+      const store = await getStore(userId)
+      return { store, data: await upgradeIncomes(store, await store.load()) }
+    })().finally(() => pendingAccountLoads.delete(userId))
+    pendingAccountLoads.set(userId, promise)
+  }
+  return promise
+}
+
+/** Incomes saved before they had a first payment date start on the 1st of the current month */
+async function upgradeIncomes(store: UserStore, own: UserData): Promise<UserData> {
+  if (own.incomes.every((income) => income.firstPaymentDate)) return own
+  const firstOfMonth = `${referenceIsoDate(own.transactions).slice(0, 7)}-01`
+  const incomes: Income[] = []
+  for (const income of own.incomes) {
+    incomes.push(
+      income.firstPaymentDate ? income : await store.update('incomes', income.id, { firstPaymentDate: firstOfMonth }),
+    )
+  }
+  return { ...own, incomes, transactions: await rebuildIncomeTransactions(store, own.transactions, incomes) }
+}
 
 /** Adds (direction 1) or reverses (direction -1) a transaction's effect on the balance */
 const applyToBalance = (balance: Balance, amount: number, direction: 1 | -1): Balance => ({
@@ -53,24 +111,41 @@ const applyToBalance = (balance: Balance, amount: number, direction: 1 | -1): Ba
   expenses: balance.expenses + direction * Math.max(-amount, 0),
 })
 
+/**
+ * Provides the signed-in user's own data. It is keyed by user, so signing in as someone
+ * else starts from an empty state and never shows the previous user's data.
+ */
 export function DataProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth()
+  return (
+    <UserDataProvider key={user?.id ?? 'signed-out'} userId={user?.id ?? null}>
+      {children}
+    </UserDataProvider>
+  )
+}
+
+function UserDataProvider({ userId, children }: { userId: number | null; children: ReactNode }) {
   const [data, setData] = useState<FinanceData>(EMPTY)
   const [status, setStatus] = useState<DataContextValue['status']>('loading')
-  const [store, setStore] = useState<Store | null>(null)
+  const [store, setStore] = useState<UserStore | null>(null)
 
   useEffect(() => {
+    if (userId === null) return
     let cancelled = false
-    getStore()
-      .then(async (s) => {
-        const db = await s.getDb()
+    // The signed-in account's own store: it only reads and writes this user's data
+    loadAccount(userId)
+      .then(({ store: s, data: own }) => {
         if (cancelled) return
+        const [balance] = own.balances
         setStore(s)
         setData({
-          balance: db.balance,
-          transactions: db.transactions,
-          budgets: db.budgets,
-          pots: db.pots,
-          recurringBills: db.recurringBills,
+          balance: { current: balance.current, income: balance.income, expenses: balance.expenses },
+          balanceId: balance.id,
+          transactions: own.transactions,
+          budgets: own.budgets,
+          pots: own.pots,
+          recurringBills: own.recurringBills,
+          incomes: own.incomes,
         })
         setStatus('ready')
       })
@@ -81,7 +156,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [userId])
 
   const requireStore = useCallback(() => {
     if (!store) throw new Error('Data is still loading')
@@ -90,14 +165,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const saveBalance = useCallback(
     async (next: Balance) => {
-      const saved = await requireStore().updateBalance({
+      const saved = await requireStore().update('balances', data.balanceId, {
         current: round(next.current),
         income: round(next.income),
         expenses: round(next.expenses),
       })
-      setData((d) => ({ ...d, balance: saved }))
+      setData((d) => ({ ...d, balance: { current: saved.current, income: saved.income, expenses: saved.expenses } }))
     },
-    [requireStore],
+    [requireStore, data.balanceId],
   )
 
   const addTransaction = useCallback<DataContextValue['addTransaction']>(
@@ -119,8 +194,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const avatar = renamed ? findAvatar(input.name, [...data.transactions, ...data.recurringBills]) : previous.avatar
       const updated = await requireStore().update('transactions', id, { ...input, avatar })
       setData((d) => ({ ...d, transactions: d.transactions.map((t) => (t.id === id ? updated : t)) }))
-      // Swap the old amount's effect on the balance for the new one
-      await saveBalance(applyToBalance(applyToBalance(data.balance, previous.amount, -1), input.amount, 1))
+      // Swap the old amount's effect on the balance for the new one (scheduled income payments
+      // were never added to the balance, so only the new amount counts for them)
+      const base = previous.fromIncome ? data.balance : applyToBalance(data.balance, previous.amount, -1)
+      await saveBalance(previous.fromIncome ? base : applyToBalance(base, input.amount, 1))
     },
     [data, requireStore, saveBalance],
   )
@@ -131,7 +208,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (!previous) return
       await requireStore().remove('transactions', id)
       setData((d) => ({ ...d, transactions: d.transactions.filter((t) => t.id !== id) }))
-      await saveBalance(applyToBalance(data.balance, previous.amount, -1))
+      // Scheduled income payments were never added to the balance
+      if (!previous.fromIncome) await saveBalance(applyToBalance(data.balance, previous.amount, -1))
     },
     [data, requireStore, saveBalance],
   )
@@ -236,6 +314,32 @@ export function DataProvider({ children }: { children: ReactNode }) {
     [requireStore],
   )
 
+  const saveIncomes = useCallback<DataContextValue['saveIncomes']>(
+    async (list) => {
+      const s = requireStore()
+      const keptIds = new Set(list.map((item) => item.id).filter((id): id is number => id !== undefined))
+      for (const previous of data.incomes) {
+        if (!keptIds.has(previous.id)) await s.remove('incomes', previous.id)
+      }
+      const saved: Income[] = []
+      for (const { id, amount, frequency, firstPaymentDate } of list) {
+        const previous = id === undefined ? undefined : data.incomes.find((i) => i.id === id)
+        const unchanged =
+          previous &&
+          previous.amount === amount &&
+          previous.frequency === frequency &&
+          previous.firstPaymentDate === firstPaymentDate
+        if (previous && unchanged) saved.push(previous)
+        else if (previous) saved.push(await s.update('incomes', previous.id, { amount, frequency, firstPaymentDate }))
+        else saved.push(await s.create('incomes', { amount, frequency, firstPaymentDate }))
+      }
+      // Each payment becomes a deposit on the Transactions page, post-dated to the end of the month
+      const transactions = await rebuildIncomeTransactions(s, data.transactions, saved)
+      setData((d) => ({ ...d, incomes: saved, transactions }))
+    },
+    [data.incomes, data.transactions, requireStore],
+  )
+
   const referenceDate = useMemo(() => getReferenceDate(data.transactions), [data.transactions])
 
   const value = useMemo<DataContextValue>(
@@ -256,6 +360,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       addBill,
       updateBill,
       deleteBill,
+      saveIncomes,
     }),
     [
       data,
@@ -274,6 +379,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       addBill,
       updateBill,
       deleteBill,
+      saveIncomes,
     ],
   )
 

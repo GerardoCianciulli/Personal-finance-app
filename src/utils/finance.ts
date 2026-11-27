@@ -1,17 +1,15 @@
+import { endOfMonth, incomePaymentDates, referenceIsoDate } from '../../scripts/db-seed.mjs'
 import { DUE_SOON_DAYS } from '../constants'
-import type { BillStatus, Category, RecurringBill, SortOption, Transaction } from '../types'
+import type { BillStatus, Category, Income, RecurringBill, SortOption, Transaction } from '../types'
 import { dayOfMonth, formatDate, formatDueDay, formatMoney, formatSignedMoney } from './format'
 
 /**
- * The app treats the date of the most recent transaction as "today"
- * (19 August 2024 in the sample data), so every monthly figure matches the design.
+ * The app treats the date of the most recent transaction as "today" (19 August 2024 in the
+ * sample data), so every monthly figure matches the design. Scheduled income payments are
+ * ignored here because they can be post-dated to the end of the month.
  */
 export function getReferenceDate(transactions: Transaction[]): Date {
-  if (transactions.length === 0) return new Date()
-  return transactions.reduce((latest, t) => {
-    const d = new Date(t.date)
-    return d > latest ? d : latest
-  }, new Date(transactions[0].date))
+  return new Date(`${referenceIsoDate(transactions)}T00:00:00Z`)
 }
 
 const isSameMonth = (a: Date, b: Date) =>
@@ -157,4 +155,20 @@ export function sortBills(list: RecurringBill[], sort: SortOption): RecurringBil
 export function findAvatar(name: string, sources: { name: string; avatar: string }[]): string {
   const key = name.trim().toLowerCase()
   return sources.find((s) => s.avatar && s.name.trim().toLowerCase() === key)?.avatar ?? ''
+}
+
+/**
+ * Income received in the current month: every payment of every income whose date falls in the
+ * month of `reference` (the app's "today"). Payments dated in other months are not counted.
+ */
+export function getMonthlyIncome(
+  incomes: Pick<Income, 'amount' | 'frequency' | 'firstPaymentDate'>[],
+  reference: Date,
+): number {
+  const month = reference.toISOString().slice(0, 7)
+  const total = incomes.reduce((sum, income) => {
+    const payments = incomePaymentDates(income.firstPaymentDate, income.frequency, endOfMonth(`${month}-01`))
+    return sum + payments.filter((date) => date.startsWith(month)).length * income.amount
+  }, 0)
+  return Math.round(total * 100) / 100
 }

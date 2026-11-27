@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
-import { getStore } from '../api/client'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { getAccounts } from '../api/client'
 import type { User } from '../types'
 
 interface Session {
@@ -45,8 +45,7 @@ function readSession(): Session | null {
 }
 
 async function findUser(email: string): Promise<User | undefined> {
-  const store = await getStore()
-  const { users } = await store.getDb()
+  const users = await (await getAccounts()).list()
   return users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase())
 }
 
@@ -62,8 +61,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = useCallback<AuthContextValue['signUp']>(
     async ({ name, email, password }) => {
       if (await findUser(email)) throw new AuthError('email', 'An account with this email already exists')
-      const store = await getStore()
-      const created = await store.create('users', {
+      const accounts = await getAccounts()
+      const created = await accounts.create({
         name: name.trim().replace(/\s+/g, ' '),
         email: email.trim(),
         passwordHash: await hashPassword(email.trim(), password),
@@ -76,9 +75,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logIn = useCallback<AuthContextValue['logIn']>(
     async ({ email, password }) => {
       const found = await findUser(email)
-      if (!found) throw new AuthError('email', 'No account found with this email')
-      if (found.passwordHash !== (await hashPassword(found.email, password))) {
-        throw new AuthError('password', 'Incorrect password')
+      // The password is hashed even for unknown emails, and both failures give the same message,
+      // so the login form never reveals which email addresses have an account
+      const passwordHash = await hashPassword(found?.email ?? email.trim(), password)
+      if (!found || found.passwordHash !== passwordHash) {
+        throw new AuthError('password', 'Incorrect email or password')
       }
       startSession(found)
     },
@@ -89,6 +90,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(SESSION_KEY)
     setUser(null)
   }, [])
+
+  // A saved session for an account that no longer exists (e.g. the database was reset) is ended
+  useEffect(() => {
+    if (!user) return
+    let cancelled = false
+    getAccounts()
+      .then((accounts) => accounts.list())
+      .then((users) => {
+        if (!cancelled && !users.some((u) => u.id === user.id)) logOut()
+      })
+      .catch(() => {
+        // keep the session if the store can't be reached
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [user, logOut])
 
   const value = useMemo(() => ({ user, signUp, logIn, logOut }), [user, signUp, logIn, logOut])
 

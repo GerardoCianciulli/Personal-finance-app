@@ -18,6 +18,18 @@
   color: var(--color-grey-500);
 }
 
+.summary-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-200);
+}
+
+/* Keep the card the same height as the others: the menu button fits the label's line */
+.summary-card__header .ellipsis-menu__trigger {
+  height: 1.3125rem;
+}
+
 .summary-card--dark {
   background-color: var(--color-grey-900);
   color: var(--color-white);

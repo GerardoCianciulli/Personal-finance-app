@@ -1,0 +1,95 @@
+.income-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-250);
+}
+
+.income-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.income-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-200);
+  padding: var(--space-200) 0;
+}
+
+.income-row:first-child {
+  padding-top: 0;
+}
+
+.income-row:last-child {
+  padding-bottom: 0;
+}
+
+.income-row + .income-row {
+  border-top: 0.0625rem solid var(--color-grey-100);
+}
+
+.income-row__fields {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 10rem);
+  gap: var(--space-200);
+}
+
+/* First Payment Date sits under Amount and Frequency, across the row */
+.income-row__date {
+  grid-column: 1 / -1;
+}
+
+/* Lines up with the centre of the inputs (label + gap above them) */
+.income-row__remove {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin-top: 1.8125rem;
+  border-radius: 50%;
+}
+
+.income-row__remove svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.income-row__remove path {
+  fill: var(--color-grey-500);
+  transition: fill var(--transition);
+}
+
+.income-row__remove:hover path,
+.income-row__remove:focus-visible path {
+  fill: var(--color-red);
+}
+
+.income-row__remove:focus-visible {
+  outline: none;
+}
+
+.income-list__empty {
+  padding: var(--space-200) 0;
+  text-align: center;
+  color: var(--color-grey-500);
+}
+
+.income-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-200);
+  padding: var(--space-200);
+  background-color: var(--color-beige-100);
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 40rem) {
+  .income-row__fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-150);
+  }
+}

@@ -40,3 +40,10 @@ export const TRANSACTIONS_PER_PAGE = 10
 export const DUE_SOON_DAYS = 5
 
 export const POT_NAME_MAX_LENGTH = 30
+
+/** How often an income is received: every 7 days, every 14 days, or on the same day each month */
+export const INCOME_FREQUENCIES = [
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'biweekly', label: 'Biweekly' },
+  { value: 'monthly', label: 'Monthly' },
+] as const
