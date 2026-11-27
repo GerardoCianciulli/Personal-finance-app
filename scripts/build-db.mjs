@@ -1,6 +1,6 @@
 // Creates the json-server database (db.json).
-//   npm run seed          -> (re)creates an empty db.json: no accounts yet. Each account gets its
-//                            own copy of the sample data (data.json) when it signs up.
+//   npm run seed          -> (re)creates an empty db.json: no accounts yet. Each new account starts
+//                            with empty lists (income, transactions, budgets, pots, bills).
 //   --if-missing          -> keeps an existing db.json (used by `npm run server`), upgrading data
 //                            saved by older versions of the app (see `migrate`)
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
@@ -23,5 +23,5 @@ if (process.argv.includes('--if-missing') && existsSync(target)) {
   }
 } else {
   save(emptyDb())
-  console.log('db.json reset: no accounts yet. Each account gets its own sample data at sign up.')
+  console.log('db.json reset: no accounts yet. New accounts start with empty lists.')
 }

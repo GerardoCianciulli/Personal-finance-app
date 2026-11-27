@@ -147,7 +147,9 @@ export default function Transactions() {
           </table>
         ) : (
           <p className="empty-state" role="status">
-            No transactions match your search.
+            {transactions.length
+              ? 'No transactions match your search.'
+              : 'You don’t have any transactions yet. Add one to get started.'}
           </p>
         )}
 

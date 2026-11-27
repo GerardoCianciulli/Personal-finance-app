@@ -93,14 +93,6 @@ export interface Database extends UserData {
   users: User[]
 }
 
-/** Shape of the provided data.json sample file */
-export interface SampleData {
-  balance: Balance
-  transactions: Omit<Transaction, 'id' | 'userId'>[]
-  budgets: Omit<Budget, 'id' | 'userId'>[]
-  pots: Omit<Pot, 'id' | 'userId'>[]
-}
-
 export type CollectionName = keyof Database
 
 export type CollectionItem<K extends CollectionName> = Database[K][number]

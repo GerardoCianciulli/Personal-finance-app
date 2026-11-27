@@ -1,5 +1,5 @@
-// Pure functions shared by the json-server seed script (Node) and the in-browser store,
-// so both work with identical data. Keep this file free of Node-only imports.
+// Pure functions shared by the json-server scripts (Node) and the app, so both handle data the
+// same way. Keep this file free of Node-only imports.
 //
 // Every user owns their own records: each balance, transaction, budget, pot, recurring bill
 // and income carries the `userId` of the account it belongs to.
@@ -25,7 +25,7 @@ export function endOfMonth(iso) {
 
 /**
  * The app's "today": the date of the latest transaction, ignoring scheduled income payments
- * (which can be post-dated). With the sample data this is 19 August 2024.
+ * (which can be post-dated). Without any transactions, it is the real date today.
  * @param {{ date: string, fromIncome?: boolean }[]} transactions
  */
 export function referenceIsoDate(transactions) {
@@ -99,53 +99,16 @@ export function incomeTransactions(income, referenceDate) {
   )
 }
 
-/** An empty database: accounts are created at sign up, each with its own copy of the sample data */
+/** An empty database: accounts are created at sign up, and each one starts with empty lists */
 export function emptyDb() {
   return { users: [], ...Object.fromEntries(USER_COLLECTIONS.map((name) => [name, []])) }
 }
 
 /**
- * A new user's own copy of the sample data (records without ids; the store assigns them).
- * The sample has one income figure, which becomes one monthly income the user can edit.
- * Recurring bills: one per vendor, from that vendor's latest recurring transaction.
- * @param {any} data contents of data.json
- * @param {number} userId
- */
-export function buildUserData(data, userId) {
-  const transactions = data.transactions.map((t) => ({ ...t, userId }))
-  // The sample's income is one monthly payment, first paid on the 1st of the current month
-  const reference = referenceIsoDate(transactions)
-  const income = { amount: data.balance.income, frequency: 'monthly', firstPaymentDate: `${reference.slice(0, 7)}-01` }
-
-  const latestByVendor = new Map()
-  for (const t of transactions) {
-    if (!t.recurring) continue
-    const current = latestByVendor.get(t.name)
-    if (!current || new Date(t.date) > new Date(current.date)) latestByVendor.set(t.name, t)
-  }
-
-  return {
-    balances: [{ ...data.balance, userId }],
-    transactions: [...transactions, ...incomeTransactions(income, reference).map((t) => ({ ...t, userId }))],
-    budgets: data.budgets.map((b) => ({ ...b, userId })),
-    pots: data.pots.map((p) => ({ ...p, userId })),
-    recurringBills: [...latestByVendor.values()].map((t) => ({
-      name: t.name,
-      avatar: t.avatar,
-      category: t.category,
-      amount: Math.abs(t.amount),
-      dueDate: t.date.slice(0, 10),
-      userId,
-    })),
-    incomes: [{ ...income, userId }],
-  }
-}
-
-/**
  * Upgrades a database saved by an earlier version of the app, where every account shared one
  * set of data (a single `balance` object and records without `userId`). That shared data is
- * kept for the oldest account; any other account gets its own copy of the sample data the next
- * time it signs in. Returns the same object when the database is already up to date.
+ * kept for the oldest account; any other account starts with empty lists the next time it
+ * signs in. Returns the same object when the database is already up to date.
  * @param {any} db
  */
 export function migrate(db) {

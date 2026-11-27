@@ -46,15 +46,15 @@ Your users should be able to:
 - Overview
   - This page displays all the information at-a-glance and allows for easy navigation.
 - Transactions
-  - The transactions from the `data.json` file are paginated for every ten transactions.
+  - Transactions are paginated for every ten transactions.
   - The search matches the recipient/sender name, category, transaction date and amount.
   - The sorting options include: Latest (most recent), Oldest, A to Z, Z to A, Highest (transaction amount), Lowest.
   - The filter is by transaction category, which are: Entertainment, Bills, Groceries, Dining Out, Transportation, Personal Care, Education, Lifestyle, Shopping, General. Filtering by category only shows transactions from the selected category.
 - Budgets
-  - The "Spent" amount is the money spent within the category for the current month (August 2024 in the app).
+  - The "Spent" amount is the money spent within the category for the current month (the month of the latest transaction).
   - The "Latest Spending" component displays the three last transactions for that category regardless of the month.
   - Clicking "See All" on a budget navigates to the Transactions page with the filter set to the relevant category.
-  - Adding a new budget automatically pulls in the three latest transactions from the created budget category and calculates the amount spent so far for August 2024.
+  - Adding a new budget automatically pulls in the three latest transactions from the created budget category and calculates the amount spent so far this month.
   - Deleting a budget removes it from the Budgets page and the Overview.
 - Pots
   - Adding money to a pot deducts the given amount from the current balance (seen on the Overview page).
@@ -62,8 +62,8 @@ Your users should be able to:
   - Deleting a pot returns all the money from the pot to the current balance.
 - Recurring Bills
   - Only one item is shown per vendor.
-  - Bills already paid in August 2024 are marked as paid.
-  - Bills due within five days of the latest overall transaction in the app (Emma Richardson - 19 August 2024) and not yet paid are marked as due soon.
+  - Bills already paid this month are marked as paid.
+  - Bills due within five days of the latest transaction and not yet paid are marked as due soon.
   - The sorting options include: Latest (earliest in the month), Oldest, A to Z, Z to A, Highest (transaction amount), Lowest.
 
 ### Links
@@ -154,12 +154,12 @@ import IconNavOverview from '../assets/images/icon-nav-overview.svg?react'
 
 #### One data layer for json-server and GitHub Pages
 
-The data is read and written with Fetch through json-server during development. GitHub Pages can't run json-server, so the app falls back to a store in `localStorage` that is seeded from the same `data.json` file. Both stores share one interface, so the pages never know which one they are using.
+The data is read and written with Fetch through json-server during development. GitHub Pages can't run json-server, so the app falls back to a store in `localStorage`. Both stores share one interface, so the pages never know which one they are using. Every account has its own data, and a new account starts with empty lists for income, transactions, budgets, pots and recurring bills.
 
 ```bash
 npm install
 npm run dev      # json-server on http://localhost:3001 + Vite on http://localhost:5173/Personal-finance-app/
-npm run seed     # reset db.json to the sample data
+npm run seed     # reset db.json (removes every account)
 npm run deploy   # build and publish the dist folder to GitHub Pages
 ```
 

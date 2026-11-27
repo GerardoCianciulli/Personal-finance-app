@@ -4,8 +4,8 @@ import type { BillStatus, Category, Income, RecurringBill, SortOption, Transacti
 import { dayOfMonth, formatDate, formatDueDay, formatMoney, formatSignedMoney } from './format'
 
 /**
- * The app treats the date of the most recent transaction as "today" (19 August 2024 in the
- * sample data), so every monthly figure matches the design. Scheduled income payments are
+ * The app treats the date of the most recent transaction as "today" (the real date when there
+ * are no transactions yet), and monthly figures use that month. Scheduled income payments are
  * ignored here because they can be post-dated to the end of the month.
  */
 export function getReferenceDate(transactions: Transaction[]): Date {

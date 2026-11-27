@@ -62,17 +62,21 @@ export default function Overview() {
                   <p className="text-preset-1">{formatMoneyShort(totalSaved)}</p>
                 </div>
               </div>
-              <ul className="legend legend--grid">
-                {pots.slice(0, 4).map((pot) => (
-                  <li key={pot.id} className="legend__item">
-                    <span className="color-tag" style={{ backgroundColor: pot.theme }} />
-                    <span className="legend__text">
-                      <span className="text-preset-5 text-muted">{pot.name}</span>
-                      <span className="text-preset-4-bold">{formatMoneyShort(pot.total)}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              {pots.length ? (
+                <ul className="legend legend--grid">
+                  {pots.slice(0, 4).map((pot) => (
+                    <li key={pot.id} className="legend__item">
+                      <span className="color-tag" style={{ backgroundColor: pot.theme }} />
+                      <span className="legend__text">
+                        <span className="text-preset-5 text-muted">{pot.name}</span>
+                        <span className="text-preset-4-bold">{formatMoneyShort(pot.total)}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="empty-state">No pots yet.</p>
+              )}
             </div>
           </SectionCard>
 

@@ -134,7 +134,9 @@ export default function RecurringBills() {
             </table>
           ) : (
             <p className="empty-state" role="status">
-              No bills match your search.
+              {recurringBills.length
+                ? 'No bills match your search.'
+                : 'You don’t have any recurring bills yet. Add one to get started.'}
             </p>
           )}
         </section>

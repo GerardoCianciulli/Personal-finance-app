@@ -1,6 +1,5 @@
-import sampleData from '../../data.json'
-import { buildUserData, migrate, nextId, USER_COLLECTIONS } from '../../scripts/db-seed.mjs'
-import type { Database, SampleData, User, UserCollectionName, UserData } from '../types'
+import { migrate, nextId, USER_COLLECTIONS } from '../../scripts/db-seed.mjs'
+import type { BalanceRecord, Database, User, UserCollectionName, UserData } from '../types'
 
 /**
  * Data access, with two backends behind the same interfaces:
@@ -10,7 +9,7 @@ import type { Database, SampleData, User, UserCollectionName, UserData } from '.
  * Accounts are shared by everyone (`getAccounts`), while each account's finances live in
  * their own store (`getStore(user.id)`): budgets, transactions, pots, recurring bills, incomes
  * and the balance. A store only ever reads or writes the data of the account it was opened
- * for, and the first time an account loads, its store is seeded with a fresh copy of data.json.
+ * for. A new account starts with empty lists and a zero balance: nothing is prefilled.
  */
 
 type Item<K extends UserCollectionName> = UserData[K][number]
@@ -20,7 +19,7 @@ export type NewItem<K extends UserCollectionName> = Omit<Item<K>, 'id' | 'userId
 /** The signed-in account's own data */
 export interface UserStore {
   readonly userId: number
-  /** Loads the account's data; the first time, creates it as a copy of data.json */
+  /** Loads the account's data; the first time, sets the account up with empty lists */
   load(): Promise<UserData>
   create<K extends UserCollectionName>(name: K, item: NewItem<K>): Promise<Item<K>>
   update<K extends UserCollectionName>(name: K, id: number, patch: Partial<NewItem<K>>): Promise<Item<K>>
@@ -33,8 +32,8 @@ export interface AccountStore {
   create(user: Omit<User, 'id'>): Promise<User>
 }
 
-/** Balances last: an account whose balance exists has a complete copy of the sample data */
-const SEED_ORDER: UserCollectionName[] = [...USER_COLLECTIONS.filter((n) => n !== 'balances'), 'balances']
+/** A new account's only record: a zero balance, which also marks the account as set up */
+const emptyBalance = (userId: number): Omit<BalanceRecord, 'id'> => ({ current: 0, income: 0, expenses: 0, userId })
 
 /** Shares one in-flight load per account, so two simultaneous loads can't seed the data twice */
 const pendingLoads = new Map<string, Promise<UserData>>()
@@ -87,15 +86,8 @@ function serverStore(userId: number): UserStore {
       loadOnce(`server:${userId}`, async () => {
         const data = await fetchAll()
         if (data.balances.length) return data
-        // No balance yet: the copy of the sample data was never completed, so remove anything
-        // an interrupted attempt left behind before creating it, one request at a time
-        for (const name of SEED_ORDER) {
-          for (const record of data[name]) await request(`/${name}/${record.id}`, { method: 'DELETE' })
-        }
-        const seed = buildUserData(sampleData as SampleData, userId)
-        for (const name of SEED_ORDER) {
-          for (const record of seed[name]) await request(`/${name}`, { method: 'POST', body: JSON.stringify(record) })
-        }
+        // First sign-in: every list starts empty, only the zero balance is created
+        await request('/balances', { method: 'POST', body: JSON.stringify(emptyBalance(userId)) })
         return fetchAll()
       }),
     create: (name, item) => request(`/${name}`, { method: 'POST', body: JSON.stringify({ ...item, userId }) }),
@@ -131,8 +123,8 @@ const writeJson = (key: string, value: unknown) => localStorage.setItem(key, JSO
 
 /**
  * Earlier versions kept everything under one key, shared by every account. Accounts move to the
- * shared users key; the shared data goes to the oldest account (other accounts get their own
- * copy of data.json when they next sign in).
+ * shared users key; the shared data goes to the oldest account (other accounts start empty
+ * when they next sign in).
  */
 function upgradeLegacyStorage() {
   const legacy = readJson<Database>(LEGACY_KEY)
@@ -170,15 +162,13 @@ function browserStore(userId: number): UserStore {
   const write = (data: UserData) => writeJson(key, data)
   const list = <K extends UserCollectionName>(data: UserData, name: K) => data[name] as Item<K>[]
 
-  /** Reads the account's data, creating it from data.json the first time */
+  /** Reads the account's data; the first time, sets it up with empty lists and a zero balance */
   const readOrSeed = (): UserData => {
     upgradeLegacyStorage()
     const saved = read()
     if (saved?.balances?.length) return saved
-    const seed = buildUserData(sampleData as SampleData, userId)
-    const fresh = Object.fromEntries(
-      SEED_ORDER.map((name) => [name, seed[name].map((record, index) => ({ ...record, id: index + 1 }))]),
-    ) as unknown as UserData
+    const fresh = Object.fromEntries(USER_COLLECTIONS.map((name) => [name, []])) as unknown as UserData
+    fresh.balances.push({ ...emptyBalance(userId), id: 1 })
     write(fresh)
     return fresh
   }
