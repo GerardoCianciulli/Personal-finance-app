@@ -7,6 +7,7 @@ export { default as IconNavBudgets } from '../assets/images/icon-nav-budgets.svg
 export { default as IconNavPots } from '../assets/images/icon-nav-pots.svg?react'
 export { default as IconNavRecurringBills } from '../assets/images/icon-nav-recurring-bills.svg?react'
 export { default as IconMinimizeMenu } from '../assets/images/icon-minimize-menu.svg?react'
+export { default as IconAvatar } from '../assets/images/icon-avatar.svg?react'
 export { default as IconCaretRight } from '../assets/images/icon-caret-right.svg?react'
 export { default as IconCaretLeft } from '../assets/images/icon-caret-left.svg?react'
 export { default as IconCaretDown } from '../assets/images/icon-caret-down.svg?react'

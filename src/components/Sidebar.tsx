@@ -1,6 +1,8 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import type { ComponentType, SVGProps } from 'react'
+import { useAuth } from '../context/AuthContext'
 import {
+  IconAvatar,
   IconMinimizeMenu,
   IconNavBudgets,
   IconNavOverview,
@@ -28,9 +30,19 @@ const NAV_ITEMS: NavItem[] = [
 
 /**
  * Desktop: full height sidebar that can be minimized (handled with jQuery in AppLayout).
- * Tablet and mobile: the same navigation becomes a bar fixed to the bottom of the screen.
+ * Sign-out sits at the bottom of the panel, above Minimize Menu.
+ * Tablet and mobile: the same navigation becomes a bar fixed to the bottom of the screen,
+ * with Sign-out as its last item.
  */
 export default function Sidebar() {
+  const { logOut } = useAuth()
+  const navigate = useNavigate()
+
+  const signOut = () => {
+    logOut()
+    navigate('/login', { replace: true })
+  }
+
   return (
     <aside className="sidebar">
       <div className="sidebar__logo">
@@ -50,6 +62,14 @@ export default function Sidebar() {
               </NavLink>
             </li>
           ))}
+          <li className="sidebar__signout-item">
+            <button type="button" className="sidebar__link sidebar__signout" onClick={signOut}>
+              <span className="sidebar__icon" aria-hidden="true">
+                <IconAvatar />
+              </span>
+              <span className="sidebar__label">Sign-out</span>
+            </button>
+          </li>
         </ul>
       </nav>
 
