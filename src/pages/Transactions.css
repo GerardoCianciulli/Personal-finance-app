@@ -46,9 +46,14 @@
   width: 9.5rem;
 }
 
-.tx-table th:last-child {
+.tx-table th:nth-child(4) {
   width: 12.5rem;
   text-align: right;
+}
+
+/* Edit / Delete ellipsis menu column */
+.tx-table th:nth-child(5) {
+  width: 2.5rem;
 }
 
 .tx-table td {
@@ -102,6 +107,16 @@ td.tx-table__amount.text-positive {
   color: var(--color-green);
 }
 
+td.tx-table__menu {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+td.tx-table__menu .ellipsis-menu {
+  display: flex;
+  justify-content: flex-end;
+}
+
 /* Tablet ------------------------------------------------------------------- */
 @media (max-width: 64rem) {
   .toolbar {
@@ -120,7 +135,7 @@ td.tx-table__amount.text-positive {
     width: 8.5rem;
   }
 
-  .tx-table th:last-child {
+  .tx-table th:nth-child(4) {
     width: 7.5rem;
   }
 }
@@ -149,10 +164,10 @@ td.tx-table__amount.text-positive {
 
   .tx-table tr {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     grid-template-areas:
-      'name amount'
-      'category date';
+      'name amount menu'
+      'category date menu';
     align-items: center;
     column-gap: var(--space-150);
     row-gap: var(--space-50);
@@ -193,5 +208,9 @@ td.tx-table__amount.text-positive {
 
   td.tx-table__amount {
     grid-area: amount;
+  }
+
+  td.tx-table__menu {
+    grid-area: menu;
   }
 }

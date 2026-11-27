@@ -19,6 +19,8 @@ interface DataContextValue extends FinanceData {
   /** "Today" for the app: the date of the most recent transaction */
   referenceDate: Date
   addTransaction(input: NewTransaction): Promise<void>
+  updateTransaction(id: number, input: NewTransaction): Promise<void>
+  deleteTransaction(id: number): Promise<void>
   addBudget(input: Omit<Budget, 'id'>): Promise<void>
   updateBudget(id: number, input: Omit<Budget, 'id'>): Promise<void>
   deleteBudget(id: number): Promise<void>
@@ -43,6 +45,13 @@ const EMPTY: FinanceData = {
 }
 
 const round = (value: number) => Math.round(value * 100) / 100
+
+/** Adds (direction 1) or reverses (direction -1) a transaction's effect on the balance */
+const applyToBalance = (balance: Balance, amount: number, direction: 1 | -1): Balance => ({
+  current: balance.current + direction * amount,
+  income: balance.income + direction * Math.max(amount, 0),
+  expenses: balance.expenses + direction * Math.max(-amount, 0),
+})
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<FinanceData>(EMPTY)
@@ -97,12 +106,32 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const avatar = findAvatar(input.name, [...data.transactions, ...data.recurringBills])
       const created = await s.create('transactions', { ...input, avatar, recurring: false })
       setData((d) => ({ ...d, transactions: [...d.transactions, created] }))
-      const { balance } = data
-      await saveBalance({
-        current: balance.current + input.amount,
-        income: balance.income + Math.max(input.amount, 0),
-        expenses: balance.expenses + Math.max(-input.amount, 0),
-      })
+      await saveBalance(applyToBalance(data.balance, input.amount, 1))
+    },
+    [data, requireStore, saveBalance],
+  )
+
+  const updateTransaction = useCallback<DataContextValue['updateTransaction']>(
+    async (id, input) => {
+      const previous = data.transactions.find((t) => t.id === id)
+      if (!previous) return
+      const renamed = previous.name.trim().toLowerCase() !== input.name.trim().toLowerCase()
+      const avatar = renamed ? findAvatar(input.name, [...data.transactions, ...data.recurringBills]) : previous.avatar
+      const updated = await requireStore().update('transactions', id, { ...input, avatar })
+      setData((d) => ({ ...d, transactions: d.transactions.map((t) => (t.id === id ? updated : t)) }))
+      // Swap the old amount's effect on the balance for the new one
+      await saveBalance(applyToBalance(applyToBalance(data.balance, previous.amount, -1), input.amount, 1))
+    },
+    [data, requireStore, saveBalance],
+  )
+
+  const deleteTransaction = useCallback<DataContextValue['deleteTransaction']>(
+    async (id) => {
+      const previous = data.transactions.find((t) => t.id === id)
+      if (!previous) return
+      await requireStore().remove('transactions', id)
+      setData((d) => ({ ...d, transactions: d.transactions.filter((t) => t.id !== id) }))
+      await saveBalance(applyToBalance(data.balance, previous.amount, -1))
     },
     [data, requireStore, saveBalance],
   )
@@ -215,6 +244,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       status,
       referenceDate,
       addTransaction,
+      updateTransaction,
+      deleteTransaction,
       addBudget,
       updateBudget,
       deleteBudget,
@@ -231,6 +262,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       status,
       referenceDate,
       addTransaction,
+      updateTransaction,
+      deleteTransaction,
       addBudget,
       updateBudget,
       deleteBudget,

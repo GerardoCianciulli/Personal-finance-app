@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Dropdown from '../components/Dropdown'
+import EllipsisMenu from '../components/EllipsisMenu'
 import { IconFilterMobile, IconSortMobile } from '../components/icons'
 import PageHeader from '../components/PageHeader'
 import Pagination from '../components/Pagination'
@@ -8,21 +9,25 @@ import SearchField from '../components/SearchField'
 import { ALL_TRANSACTIONS, CATEGORIES, SORT_OPTIONS, TRANSACTIONS_PER_PAGE } from '../constants'
 import { useData } from '../context/DataContext'
 import { scrollIntoViewIfNeeded } from '../lib/interactions'
+import DeleteModal from '../modals/DeleteModal'
 import TransactionModal from '../modals/TransactionModal'
-import type { Category, SortOption } from '../types'
+import type { Category, SortOption, Transaction } from '../types'
 import { matchesTransaction, sortTransactions } from '../utils/finance'
 import { formatDate, formatSignedMoney } from '../utils/format'
 import './Transactions.css'
 
+type Dialog = { type: 'add' } | { type: 'edit' | 'delete'; transaction: Transaction } | null
+
 const isCategory = (value: string | null): value is Category => CATEGORIES.includes(value as Category)
 
 export default function Transactions() {
-  const { transactions } = useData()
+  const { transactions, deleteTransaction } = useData()
   const [searchParams, setSearchParams] = useSearchParams()
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortOption>('Latest')
   const [page, setPage] = useState(1)
-  const [adding, setAdding] = useState(false)
+  const [dialog, setDialog] = useState<Dialog>(null)
+  const closeDialog = () => setDialog(null)
   const cardRef = useRef<HTMLElement>(null)
 
   const categoryParam = searchParams.get('category')
@@ -54,7 +59,7 @@ export default function Transactions() {
       <PageHeader
         title="Transactions"
         action={
-          <button type="button" className="btn btn--primary" onClick={() => setAdding(true)}>
+          <button type="button" className="btn btn--primary" onClick={() => setDialog({ type: 'add' })}>
             <span>
               + Add New<span className="mobile-sr-only"> Transaction</span>
             </span>
@@ -104,6 +109,9 @@ export default function Transactions() {
                 <th scope="col">Category</th>
                 <th scope="col">Transaction Date</th>
                 <th scope="col">Amount</th>
+                <th scope="col">
+                  <span className="sr-only">Actions</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -116,6 +124,19 @@ export default function Transactions() {
                   </td>
                   <td className={`tx-table__amount${t.amount > 0 ? ' text-positive' : ''}`}>
                     {formatSignedMoney(t.amount)}
+                  </td>
+                  <td className="tx-table__menu">
+                    <EllipsisMenu
+                      label={`${t.name}, ${formatDate(t.date)}`}
+                      items={[
+                        { label: 'Edit Transaction', onSelect: () => setDialog({ type: 'edit', transaction: t }) },
+                        {
+                          label: 'Delete Transaction',
+                          danger: true,
+                          onSelect: () => setDialog({ type: 'delete', transaction: t }),
+                        },
+                      ]}
+                    />
                   </td>
                 </tr>
               ))}
@@ -132,7 +153,16 @@ export default function Transactions() {
         <Pagination page={currentPage} pageCount={pageCount} onChange={changePage} />
       </section>
 
-      {adding && <TransactionModal onClose={() => setAdding(false)} />}
+      {dialog?.type === 'add' && <TransactionModal onClose={closeDialog} />}
+      {dialog?.type === 'edit' && <TransactionModal transaction={dialog.transaction} onClose={closeDialog} />}
+      {dialog?.type === 'delete' && (
+        <DeleteModal
+          name={dialog.transaction.name}
+          kind="transaction"
+          onConfirm={() => deleteTransaction(dialog.transaction.id)}
+          onClose={closeDialog}
+        />
+      )}
     </div>
   )
 }
