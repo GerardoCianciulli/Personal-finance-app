@@ -59,9 +59,14 @@ export default function Transactions() {
       <PageHeader
         title="Transactions"
         action={
-          <button type="button" className="btn btn--primary" onClick={() => setDialog({ type: 'add' })}>
+          <button
+            type="button"
+            className="btn btn--primary"
+            aria-label="Add New Transaction"
+            onClick={() => setDialog({ type: 'add' })}
+          >
             <span>
-              + Add New<span className="mobile-sr-only"> Transaction</span>
+              + Add New<span className="btn__label-extra"> Transaction</span>
             </span>
           </button>
         }
@@ -109,9 +114,7 @@ export default function Transactions() {
                 <th scope="col">Category</th>
                 <th scope="col">Transaction Date</th>
                 <th scope="col">Amount</th>
-                <th scope="col">
-                  <span className="sr-only">Actions</span>
-                </th>
+                <th scope="col" aria-label="Actions" />
               </tr>
             </thead>
             <tbody>
@@ -143,12 +146,10 @@ export default function Transactions() {
             </tbody>
           </table>
         ) : (
-          <p className="empty-state">No transactions match your search.</p>
+          <p className="empty-state" role="status">
+            No transactions match your search.
+          </p>
         )}
-
-        <p className="sr-only" aria-live="polite">
-          {filtered.length} transactions found, page {currentPage} of {pageCount}
-        </p>
 
         <Pagination page={currentPage} pageCount={pageCount} onChange={changePage} />
       </section>

@@ -7,8 +7,6 @@ import './Auth.css'
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="auth">
-      <h1 className="sr-only">Finance</h1>
-
       <header className="auth__topbar">
         <LogoLarge aria-label="finance" role="img" />
       </header>

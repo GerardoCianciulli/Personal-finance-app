@@ -101,9 +101,7 @@ export default function RecurringBills() {
                   <th scope="col">Bill Title</th>
                   <th scope="col">Due Date</th>
                   <th scope="col">Amount</th>
-                  <th scope="col">
-                    <span className="sr-only">Actions</span>
-                  </th>
+                  <th scope="col" aria-label="Actions" />
                 </tr>
               </thead>
               <tbody>
@@ -135,7 +133,9 @@ export default function RecurringBills() {
               </tbody>
             </table>
           ) : (
-            <p className="empty-state">No bills match your search.</p>
+            <p className="empty-state" role="status">
+              No bills match your search.
+            </p>
           )}
         </section>
       </div>

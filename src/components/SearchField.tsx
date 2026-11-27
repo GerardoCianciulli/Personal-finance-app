@@ -1,4 +1,3 @@
-import { useId } from 'react'
 import { IconSearch } from './icons'
 import './form/fields.css'
 
@@ -10,16 +9,12 @@ interface SearchFieldProps {
 }
 
 export default function SearchField({ label, placeholder, value, onChange }: SearchFieldProps) {
-  const id = useId()
   return (
     <div className="search-field" role="search">
-      <label className="sr-only" htmlFor={id}>
-        {label}
-      </label>
       <div className="field__control">
         <input
-          id={id}
           type="search"
+          aria-label={label}
           className="field__input"
           placeholder={placeholder}
           value={value}
